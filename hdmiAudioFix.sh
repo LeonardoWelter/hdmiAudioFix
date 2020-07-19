@@ -14,17 +14,18 @@ sleep 1
 if rm -R ~/.config/pulse/*; then # Remove os arquivos gerados pelo PulseAudio
       echo "...OK |"
 
+      echo "| Iniciando o PulseAudio.......................OK |"
       echo -n "| Reconfigurando o PulseAudio.........."
       sleep 1
-    if pulseaudio -k; then # Gera novamente a lista de dispositivos
-      echo -n "....."
+    if pavucontrol & pulseaudio -k; then # Inicia o processo do PulseAudio para setar o dispositivo primário
+      echo -n "....."                    # Gera novamente a lista de dispositivos
       sleep 1
       echo "...OK |"
 
       echo -n "| Alterando o dispositivo primário....."
-      sleep 1
+      sleep 2
       echo -n "....."
-      sleep 1 # Necessário 2 segundos de espera para o término da geração da lista de dispositivos
+      sleep 2 # Necessário 4 segundos de espera para o término da geração da lista de dispositivos
       if pacmd set-default-sink 0; then # Configura o dispositivo primário como sendo o HDMI
         echo "...OK |"
       else
@@ -36,6 +37,13 @@ if rm -R ~/.config/pulse/*; then # Remove os arquivos gerados pelo PulseAudio
 else
     echo "ERRO |" # Fim IF Remoção de arquivos do PulseAudio
 fi
+
+echo -n "| Finalizando o PulseAudio............."
+# Necessário para esconder o output do kill no terminal
+if kill -9 $(pgrep pavucontrol) & wait $(pgrep pavucontrol) 2>/dev/null; then
+  echo "........OK |" # Mesmo que o comando dê certo ele não entrará nessa parte da condição
+fi
+echo "........OK |"
 
 echo "+=================================================+"
 sleep 2
